@@ -17,12 +17,21 @@ The diagnosis of breast cancer metastasis is done by observing the whole slide i
 
 ## Objective
 
+● Divide WSI into fixed-size tiles and label them as positive or negative 
 
+● Utilize Convolutional Neural Network (CNN) to classify WSI as tumor or normal
+
+● Generate a cancer probability map from WSI tiles
 
 ## CAMELYON17 Dataset
 
 You can get the data at [CAMELYON17](https://camelyon17.grand-challenge.org/download/) challenge (GoogleDrive/Baidu).
 
+● Contains 1000 whole-slide images (WSI) of lymph node sections 
+
+● Training set and test set contain each 100 patients, and each patient consists of five WSI
+
+● Training set contains 50 slides with detailed annotations of metastases
 
 ## Environment settings
 
@@ -38,7 +47,6 @@ This module depends upon a knowledge of [Markdown]().
 dfdsfdsfd
 ```
 
-### Any optional sections
 
 ## Usage
 
