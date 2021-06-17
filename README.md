@@ -8,7 +8,7 @@
 - [Environment settings](#environment-settings)
 - [Requirements](#requirements)
 - [Usage](#usage)
-- [Main Features](#main-features)
+- [Main Methods](#main-methods)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -78,12 +78,12 @@ The code usage guide is shown below:
 1. Move to preprocess & run `generate_tiles.py`
    -> extract tiles from WSIs
 
-2. run `generate_hdf5.py`
+2. Run `generate_hdf5.py`
    -> collect all tiles into a single hdf5 file
 
 ##### NOTE: The generated files of steps 1 and 2 are in (project/data_generated). Because the file is too large and not all uploaded, please create the folder yourself when it is running.
 
-3. move to cnn_model & run `model.py`
+3. Move to cnn_model & run `model.py`
    -> train and save classifier model
 
 ##### NOTE: The generated file of steps 3（Nope model） is in (project/data_generated). Since the file is too large and has not been uploaded, you can get the trained model [here](https://drive.google.com/file/d/1D3ZgWnOlkWNJkMFwbR7I3GEpAH7uL-Rw/view?usp=sharing).
@@ -92,8 +92,8 @@ The code usage guide is shown below:
    -> generate predicted heatmap and ground truth (mask)
 
 
-## Main Features
-
+## Main Methods
+### 
 
 ## Contributing
 
