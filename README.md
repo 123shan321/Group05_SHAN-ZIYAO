@@ -6,6 +6,7 @@
 - [Objective](#objective)
 - [CAMELYON17 Dataset](#camelyon17-dataset)
 - [Environment settings](#environment-settings)
+- [Requirements](#requirements)
 - [Install](#install)
 - [Usage](#usage)
 - [Contributing](#contributing)
@@ -37,18 +38,44 @@ You can get the data at [CAMELYON17](https://camelyon17.grand-challenge.org/down
 
 All enviroments for data processing and training model are set up with anaconda. You should execute conda activate project to enable them. And this path(/custom_modules )needs to be added to PYTHONPATH environment variable or appended to sys.path.
 
+## Requirements
 
+ATTENTION: The first half of the notebooks, which are about WSI preprocessing and Tile Classification require at least 3.5 tera bytes space for the data set, and a fairly strong GPU (at least Geforce 1070 recommended), and a lot of time to run the processes. And you will also need to install openslide, which is needed to read the WSIs tif format.
+
+Install using Conda (Recommended - Tested on Ubuntu 18.04.5)
+
+Conda Install - Openslide and Python Packages
+
+Using Conda on Ubuntu 18.04.5 (Tested):
+
+Use the following commands to create and activate a conda environment:
+
+```
+conda create -n myenv
+conda activate myenv
+```
 
 ## Install
 
-This module depends upon a knowledge of [Markdown]().
+Then install the following packages via pip/conda (note to NOT use the `--user` flag for `pip install` inside a conda env!
 
 ```
-dfdsfdsfd
+conda install scipy=1.5.4
+conda install tensorflow-gpu=1.14
+conda install -c bioconda openslide=3.4.1
+conda install -c conda-forge libiconv=1.15
+conda install -c bioconda openslide-python==1.1.1
+conda install python-graphviz=0.13.2
+pip install openslide-python==1.1.1
+pip install progress==1.5
+pip install scikit-image==0.16.2
+pip install scikit-learn==0.21.3
+pip install pandas=0.25.3
 ```
-
 
 ## Usage
+
+
 
 1. Move to preprocess & run generate_tiles.py
    -> extract tiles from WSIs
