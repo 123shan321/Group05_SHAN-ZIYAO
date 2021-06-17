@@ -1,49 +1,59 @@
 # group05 
+
 ## Histopathological-based  Metastatic Cancer Detection using  Deep learning
 
-The diagnosis of breast cancer metastasis is done by observing the whole slide image (WSI) obtained by the biopsy. Because manually annotating tumors in WSI requires extensive microscopic evaluation and is highly time-consuming, the build of automated breast cancer metastasis detection and classification models can save time and manpower, and correct the shortcomings of time-consuming and manpower consumption.
-
-## Table of Contents
-
-- [Security](#security)
-- [Background](#background)
+- [Problem Description](#problem-description)
+- [Objective](#objective)
+- [CAMELYON17 Dataset](#camelyon17-dataset)
+- [Environment settings](#environment-settings)
 - [Install](#install)
 - [Usage](#usage)
-- [API](#api)
 - [Contributing](#contributing)
 - [License](#license)
 
-## Security
+## Problem Description
 
-### Any optional sections
+The diagnosis of breast cancer metastasis is done by observing the whole slide image (WSI) obtained by the biopsy. Because manually annotating tumors in WSI requires extensive microscopic evaluation and is highly time-consuming, the build of automated breast cancer metastasis detection and classification models can save time and manpower, and correct the shortcomings of time-consuming and manpower consumption.
 
-## Background
+## Objective
 
-### Any optional sections
+
+
+## CAMELYON17 Dataset
+
+You can get the data at [CAMELYON17](https://camelyon17.grand-challenge.org/download/) challenge (GoogleDrive/Baidu).
+
+
+## Environment settings
+
+All enviroments for data processing and training model are set up with anaconda. You should execute conda activate project to enable them. And this path(/custom_modules )needs to be added to PYTHONPATH environment variable or appended to sys.path.
+
+
 
 ## Install
 
 This module depends upon a knowledge of [Markdown]().
 
 ```
+dfdsfdsfd
 ```
 
 ### Any optional sections
 
 ## Usage
 
-```
-```
+1. Move to preprocess & run generate_tiles.py
+   -> extract tiles from WSIs
 
-Note: The `license` badge image link at the top of this file should be updated with the correct `:user` and `:repo`.
+2. run generate_hdf5.py
+   -> collect all tiles into a single hdf5 file
 
-### Any optional sections
+3. move to cnn_model & run model.py
+   -> train and save classifier model
 
-## API
+4. move to heatmap_creation & run heatmap.py
+   -> generate predicted heatmap and ground truth (mask)
 
-### Any optional sections
-
-## More optional sections
 
 ## Contributing
 
