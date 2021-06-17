@@ -96,6 +96,8 @@ The code usage guide is shown below:
 
 ### Data Preprocessing_Tile extraction from WSIs
 
+With an average size of 200.000 x 100.000 pixels per WSI at the highest zoom level, it is impossible to directly train a CNN to predict the labels negative, itc, micro or macro. Therefore, the problem has to be divided into sub tasks. Extract smaller pieces from WSIs that the WSIs are divided into smaller pieces (tiles) with a fixed size, e.g. 256 x 256 pixels. Each tiles is labeled with positive or negative.
+
 
 
 ### Learning Algorithm (CNN)_Feature embedding
