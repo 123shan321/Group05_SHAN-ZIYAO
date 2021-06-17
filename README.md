@@ -7,7 +7,6 @@
 - [CAMELYON17 Dataset](#camelyon17-dataset)
 - [Environment settings](#environment-settings)
 - [Requirements](#requirements)
-- [Install](#install)
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [License](#license)
@@ -54,8 +53,6 @@ Use the following commands to create and activate a conda environment:
 conda create -n myenv
 conda activate myenv
 ```
-
-## Install
 
 Then install the following packages via pip/conda (note to NOT use the `--user` flag for `pip install` inside a conda env!
 
