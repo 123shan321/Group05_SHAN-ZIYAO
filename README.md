@@ -85,7 +85,7 @@ The code usage guide is shown below:
 3. Move to cnn_model & run `model.py`
    -> Train and save classifier model
 
-##### NOTE: The generated file of steps 3（Nope model） is in (project/data_generated). Since the file is too large and has not been uploaded, you can get the trained model [here](https://drive.google.com/file/d/1D3ZgWnOlkWNJkMFwbR7I3GEpAH7uL-Rw/view?usp=sharing).
+##### NOTE: The generated file of steps 3（Nope model） is in (project/data_generated). Since the file is too large and has not been uploaded, you can get the trained model [HERE](https://drive.google.com/file/d/1D3ZgWnOlkWNJkMFwbR7I3GEpAH7uL-Rw/view?usp=sharing).
 
 4. Move to heatmap_creation & run `heatmap.py`
    -> Generate predicted heatmap and ground truth (mask)
@@ -325,7 +325,7 @@ epochs = 25
 
 Finally save the trained model.
 
-##### NOTE: The generated file of Nope model is in (project/data_generated). Since the file is too large and has not been uploaded, you can get the trained model [here](https://drive.google.com/file/d/1D3ZgWnOlkWNJkMFwbR7I3GEpAH7uL-Rw/view?usp=sharing).
+##### NOTE: The generated file of Nope model is in (project/data_generated). Since the file is too large and has not been uploaded, you can get the trained model [HERE](https://drive.google.com/file/d/1D3ZgWnOlkWNJkMFwbR7I3GEpAH7uL-Rw/view?usp=sharing).
 
 ```
 model.save(MODEL_FINAL)
