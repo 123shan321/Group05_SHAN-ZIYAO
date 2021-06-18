@@ -96,12 +96,22 @@ The code usage guide is shown below:
 
 ### Data Preprocessing_Tile extraction from WSIs
 
-With an average size of 200.000 x 100.000 pixels per WSI at the highest zoom level, it is impossible to directly train a CNN to predict the labels negative, itc, micro or macro. Therefore, the problem has to be divided into sub tasks. Extract smaller pieces from WSIs that the WSIs are divided into smaller pieces (tiles) with a fixed size, e.g. 256 x 256 pixels. Each tiles is labeled with positive or negative.
+With an average size of `200.000 x 100.000` pixels per WSI at the highest zoom level, it is impossible to directly train a CNN to predict the labels `negative`. Therefore, the problem has to be divided into sub tasks. Extract smaller pieces from WSIs that the WSIs are divided into `smaller pieces (tiles)` with a fixed size, e.g. `256 x 256` pixels. Each tiles is labeled with `positive` or `negative`. 
 
+Our training data is stored as single `hdf5` file. `hdf5` stores data as key-dataset pair, similar to `dictionary` in python. Each key stands for each slide, and each dataset consists of tile for the slide. The keys are named as following:
 
+```
+"patient_#_node_#_tumor" # positive slide
+"patient_#_node_#_normal" # negative slide
+```
+
+For example, `patient_020_node_4_tumor` and `patient_021_node_2_normal`.
+
+Corresponding dataset is 4-dimensional array, shape of which is `(n, 256, 256, 3)` `n` is number of tiles, and `256, 256` is size of image by pixels, and `3` is the number of color channels. (R, G, and B)
 
 ### Learning Algorithm (CNN)_Feature embedding
 
+With normalized and augmented tiles, we can train a CNN to predict whether a tile contains metastases or not.
 
 
 ### Probability map generation
