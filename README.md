@@ -24,7 +24,7 @@ The diagnosis of breast cancer metastasis is done by observing the whole slide i
 
 ## CAMELYON17 Dataset
 
-You can get the data at [CAMELYON17](https://camelyon17.grand-challenge.org/download/) challenge (GoogleDrive/Baidu).
+You can get the data at [CAMELYON17 challenge](https://camelyon17.grand-challenge.org/download/)(GoogleDrive/Baidu).
 
 ● Contains 1000 whole-slide images (WSI) of lymph node sections 
 
@@ -334,7 +334,7 @@ model.save(MODEL_FINAL)
 
 Use the function `heatmap` to define and process `Prediction`, where the training and validation sets are selected from `CAMELYON17`, and the test data are from `CAMELYON16`.
 
-You can get the data at [CAMELYON16 CAMELYON17](https://camelyon17.grand-challenge.org/download/) challenge (GoogleDrive/Baidu).
+You can get the data at [CAMELYON16 challenge](https://camelyon17.grand-challenge.org/download/) and [CAMELYON17 challenge](https://camelyon17.grand-challenge.org/download/) (GoogleDrive/Baidu).
 
 ```
 # Prediction
