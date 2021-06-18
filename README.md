@@ -98,7 +98,7 @@ The code usage guide is shown below:
 
 With an average size of `200.000 x 100.000` pixels per WSI at the highest zoom level, it is impossible to directly train a CNN to predict the labels `negative`. Therefore, the problem has to be divided into sub tasks. Extract smaller pieces from WSIs that the WSIs are divided into `smaller pieces (tiles)` with a fixed size, e.g. `256 x 256` pixels. Each tiles is labeled with `positive` or `negative`. 
 
-Our training data is stored as single `hdf5` file. `hdf5` stores data as key-dataset pair, similar to `dictionary` in python. Each key stands for each slide, and each dataset consists of tile for the slide. The keys are named as following:
+Our training data is stored as single `hdf5` file if anything fails. `hdf5` stores data as key-dataset pair, similar to `dictionary` in python. Each key stands for each slide, and each dataset consists of tile for the slide. The keys are named as following:
 
 ```
 "patient_#_node_#_tumor" # positive slide
@@ -111,8 +111,92 @@ Corresponding dataset is 4-dimensional array, shape of which is `(n, 256, 256, 3
 
 ### Learning Algorithm (CNN)_Feature embedding
 
-With normalized and augmented tiles, we can train a CNN to predict whether a tile contains metastases or not.
+Define a class`TissueDataset` which handles access to our generated HDF5 file. And load data set split into training and validation data. By setting `train_data = TissueDataset(path=HDF5_FILE, percentage=0.5, first_part=True)`, we say that `training_data` consists of the first 50% of tiles of every WSI. 
 
+```
+train_data = TissueDataset(path=HDF5_FILE,  percentage=0.5, first_part=True)
+val_data = TissueDataset(path=HDF5_FILE, percentage=0.5, first_part=False)
+x, y = train_data.get_batch(num_neg=3, num_pos=3)
+```
+
+Use the method `get_batch` returns a specified number of positive and negative slides. The slides are randomly shuffeled, so the first part of the batch does not only contain positive slides, and the last part of the batch only negtive slides.
+
+```
+def get_batch(self, num_neg=10, num_pos=10, data_augm=False):
+    x_p, y_p = self.__get_random_positive_tiles(num_pos)
+    x_n, y_n = self.__get_random_negative_tiles(num_neg)
+    x = np.concatenate((x_p, x_n), axis=0)
+    y = np.concatenate((y_p, y_n), axis=0)
+    if data_augm:
+       ### some data augmentation mirroring / rotation
+       if np.random.randint(0,2): x = np.flip(x, axis=1)
+       if np.random.randint(0,2): x = np.flip(x, axis=2)
+       x = np.rot90(m=x, k=np.random.randint(0,4), axes=(1,2))
+        ### randomly arrange in order
+    p = np.random.permutation(len(y))
+    return x[p], y[p]
+```
+
+The `generator` method does the same as `get_batch`, but implements a python generator, which is very useful when training and evaluating a `tensorflow.keras` model.
+
+```   
+def generator(self, num_neg=10, num_pos=10, data_augm=False, mean=[0.,0.,0.], std=[1.,1.,1.]):
+    while True:
+        x, y = self.get_batch(num_neg, num_pos, data_augm)
+        for i in [0,1,2]:
+            x[:,:,:,i] = (x[:,:,:,i] - mean[i]) / std[i]
+        yield x, y
+```
+
+The method argument `data_augm=True` randomly rotates the batch zero to three times by 90 degrees and randomly flips is horizonally and / or vertically. Make the slides have been successfully stored in the HDF5 file, and enable them to be successfully loaded with the label.
+
+#### Defining the Convolution Neural Network
+
+Define a model for the training. Use classes / methods from `tensorflow.keras`. Also compile model with an optimizer, a loss and a metric (e.g. accuracy). As we only have two classes, we can use the binary crossentropy as loss function.
+
+``` 
+base_model = keras.applications.InceptionResNetV2(
+                                 include_top=False, 
+                                 weights='imagenet', 
+                                 input_shape=(256,256,3), 
+                                 )
+x = base_model.output
+x = keras.layers.GlobalAveragePooling2D()(x)
+x = keras.layers.Dense(1024, activation='relu')(x)
+predictions = keras.layers.Dense(1, activation='sigmoid')(x)
+
+model = keras.Model(inputs=base_model.input, outputs=predictions)
+
+model.compile(optimizer=tf.optimizers.Adam(learning_rate=0.0001), 
+              loss='binary_crossentropy',
+              metrics=['accuracy'])
+```
+
+The next step is to train and evaluate the model. Keep track the metrics loss and accuracy of training and validation data, and plot these data later.
+
+Make checkpoints every epoch. And use the `fit_generator` method of your model and pass `generator` method as parameter.
+
+The following parameters showed to work well:
+
+1. Each epoch consists of 50 training batches and 25 validations batches
+2. Each batch contains 10 negatives and 10 positives
+3. Train for at least 25 epochs
+
+```
+batch_size_neg=10
+batch_size_pos=10
+batches_per_train_epoch = 50
+batches_per_val_epoch = 25
+epochs = 25
+```
+
+Finally save the trained model.
+
+##### NOTE: The generated file of Nope model is in (project/data_generated). Since the file is too large and has not been uploaded, you can get the trained model [here](https://drive.google.com/file/d/1D3ZgWnOlkWNJkMFwbR7I3GEpAH7uL-Rw/view?usp=sharing).
+
+```
+model.save(MODEL_FINAL)
+```
 
 ### Probability map generation
 
