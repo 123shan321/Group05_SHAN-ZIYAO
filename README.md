@@ -9,7 +9,6 @@
 - [Requirements](#requirements)
 - [Usage](#usage)
 - [Main Methods](#main-methods)
-- [Contributing](#contributing)
 
 ## Problem Description
 
