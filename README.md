@@ -97,6 +97,92 @@ The code usage guide is shown below:
 
 With an average size of `200.000 x 100.000` pixels per WSI at the highest zoom level, it is impossible to directly train a CNN to predict the labels `negative`. Therefore, the problem has to be divided into sub tasks. Extract smaller pieces from WSIs that the WSIs are divided into `smaller pieces (tiles)` with a fixed size, e.g. `256 x 256` pixels. Each tiles is labeled with `positive` or `negative`. 
 
+```
+    # Slides with cancer (i.e. annotated slides)
+    for i in range(len(mgr.annotated_slides)):
+        try: 
+            
+            filename = '{}/{}_{}x{}_poi{}_poiTumor{}_level{}.hdf5'.format(generated_data_path, mgr.annotated_slides[i].name, tile_size, tile_size, 
+                                                           poi, poi_tumor, level)
+            # 'w-' creates file, fails if exists
+            h5 = h5py.File(filename, "w-", libver='latest')
+            
+            # create a new and unconsumed tile iterator
+            tile_iter = split_positive_slide(mgr.annotated_slides[i], level=level,
+                                             tile_size=tile_size, overlap=overlap_tumor,
+                                             poi_threshold=poi_tumor) 
+
+            tiles_batch = []
+            for tile, bounds in tile_iter:
+                if len(tiles_batch) % 10 == 0: print('positive slide #:', i, 'tiles so far:', len(tiles_batch))
+                if len(tiles_batch) > max_tiles_per_slide: break
+                tiles_batch.append(tile)
+
+            # creating a date set in the file
+            dset = h5.create_dataset(mgr.annotated_slides[i].name, 
+                                     (len(tiles_batch), tile_size, tile_size, 3), 
+                                     dtype=np.uint8,
+                                     data=np.array(tiles_batch),
+                                     compression=0)   
+            h5.close()
+
+            tiles_pos += len(tiles_batch)
+            print(datetime.now(), i, '/', len(mgr.annotated_slides), '  tiles  ', len(tiles_batch))
+            print('pos tiles total: ', tiles_pos)
+
+        except:
+            print('slide nr {}/{} failed'.format(i, len(mgr.annotated_slides)))
+            print(sys.exc_info()[0])
+```
+
+```
+    # Slides with no cancer (i.e. negative slides)
+    for i in range(len(mgr.negative_slides)): 
+        try:
+            filename = '{}/{}_{}x{}_poi{}_poiTumor{}_level{}.hdf5'.format(generated_data_path, mgr.negative_slides[i].name, tile_size, tile_size, 
+                                                           poi, poi_tumor, level)
+            # 'w-' creates file, fails if exists
+            h5 = h5py.File(filename, "w-", libver='latest')
+            
+            # load the slide into numpy array
+            arr = np.asarray(mgr.negative_slides[i].get_full_slide(level=4))
+
+            # convert it to gray scale
+            arr_gray = rgb2gray(arr)
+
+            # calculate otsu threshold
+            threshold = threshold_otsu(arr_gray)
+
+            # create a new and unconsumed tile iterator
+            # because we have so many  negative slides we do not use overlap
+            tile_iter = split_negative_slide(mgr.negative_slides[i], level=level,
+                                             otsu_threshold=threshold,
+                                             tile_size=tile_size, overlap=overlap,
+                                             poi_threshold=poi)
+
+            tiles_batch = []
+            for tile, bounds in tile_iter:
+                if len(tiles_batch) % 10 == 0: print('neg slide:', i, 'tiles so far:', len(tiles_batch))
+                if len(tiles_batch) > max_tiles_per_slide: break
+                tiles_batch.append(tile)
+
+            # creating a date set in the file
+            dset = h5.create_dataset(mgr.negative_slides[i].name, 
+                                     (len(tiles_batch), tile_size, tile_size, 3), 
+                                     dtype=np.uint8,
+                                     data=np.array(tiles_batch),
+                                     compression=0)
+            h5.close()
+            
+            tiles_neg += len(tiles_batch)
+            print(datetime.now(), i, '/', len(mgr.negative_slides), '  tiles  ', len(tiles_batch))
+            print('neg tiles total: ', tiles_neg)
+            
+        except:
+            print('slide nr {}/{} failed'.format(i, len(mgr.negative_slides)))
+            print(sys.exc_info()[0])
+```
+
 Our training data is stored as single `hdf5` file if anything fails. `hdf5` stores data as key-dataset pair, similar to `dictionary` in python. Each key stands for each slide, and each dataset consists of tile for the slide. The keys are named as following:
 
 ```
@@ -106,7 +192,55 @@ Our training data is stored as single `hdf5` file if anything fails. `hdf5` stor
 
 For example, `patient_020_node_4_tumor` and `patient_021_node_2_normal`.
 
+```
+if key in annotation_status['positive_slides']:
+    dset = h5_single.create_dataset(key + "_tumor", 
+        h5[key].shape, 
+        dtype=np.uint8,
+        data=h5[key][:],
+        compression=0)
+else:
+    dset = h5_single.create_dataset(key + "_normal", 
+        h5[key].shape, 
+        dtype=np.uint8,
+        data=h5[key][:],
+        compression=0)
+```
+
 Corresponding dataset is 4-dimensional array, shape of which is `(n, 256, 256, 3)` `n` is number of tiles, and `256, 256` is size of image by pixels, and `3` is the number of color channels. (R, G, and B)
+
+Create a new ,and final HDF5 file to contain all tiles of all WSIs just created.
+
+```
+single_file = '{}/all_wsis_{}x{}_poi{}_poiTumor{}_level{}.hdf5'.format(generated_data_path, tile_size, tile_size, 
+                                                       poi, poi_tumor, level)
+h5_single = h5py.File(single_file, 'w')
+
+for f in os.listdir(generated_data_path):
+    if f.startswith('patient'):
+        filename = os.path.join(generated_data_path, f)
+        with h5py.File(filename, 'r') as h5:
+            for key in h5.keys():
+                print('processing: "{}", shape: {}'.format(key, h5[key].shape))
+                if h5[key].shape[0] > 0: ### dont create dsets for WSIs with 0 tiles
+                    if key in annotation_status['positive_slides']:
+                        dset = h5_single.create_dataset(key + "_tumor", 
+                            h5[key].shape, 
+                            dtype=np.uint8,
+                            data=h5[key][:],
+                            compression=0)
+                    else:
+                        dset = h5_single.create_dataset(key + "_normal", 
+                            h5[key].shape, 
+                            dtype=np.uint8,
+                            data=h5[key][:],
+                            compression=0)
+
+            
+h5_single.close()
+```
+
+Collecting all the tiles into one hdf5 file like this can further reduce the reading time.
 
 ### Learning Algorithm (CNN)_Feature embedding
 
