@@ -200,10 +200,38 @@ model.save(MODEL_FINAL)
 
 ### Probability map generation
 
+Use the function `heatmap` to define and process `Prediction`, where the training and validation sets are selected from `CAMELYON17`, and the test data are from `CAMELYON16`.
 
-##
-## Contributing
+You can get the data at [CAMELYON16 CAMELYON17](https://camelyon17.grand-challenge.org/download/) challenge (GoogleDrive/Baidu).
 
+```
+# Prediction
+size = (int(slide.dimensions[0] / 512), int(slide.dimensions[1] / 512))
+arr = np.asarray(slide.get_full_slide(level=6))
+arr_gray = rgb2gray(arr)
+threshold = threshold_otsu(arr_gray)
+tile_iter = split_negative_slide(
+    slide, level=3,
+    otsu_threshold=threshold,  # otsu threshold calculated earlier
+    tile_size=256,
+    overlap=0,                 # no overlap
+    poi_threshold=0.9
+ )
+pred = np.zeros(size)
+for tile, bound in tqdm(tile_iter):
+    prob = model.predict(tile.reshape(1, 256, 256, 3) / 255)
+    for i in range(4):
+        for j in range(4):
+            pred[int(bound[0][0] / 512) + i, int(bound[0][1] / 512) + j] = prob[0][0]
+print("prediction done.")
+```
+plot images and save them.
+
+```
+plt.savefig("{}_heatmap_pred.png".format(slide_name), facecolor='w', dpi=600)
+np.save("{}_mask_true.npy".format(slide_name), mask)
+np.save("{}_mask_pred.npy".format(slide_name), pred.T)
+```
 
 
 ## License
