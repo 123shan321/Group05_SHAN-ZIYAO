@@ -10,7 +10,6 @@
 - [Usage](#usage)
 - [Main Methods](#main-methods)
 - [Contributing](#contributing)
-- [License](#license)
 
 ## Problem Description
 
@@ -232,8 +231,3 @@ plt.savefig("{}_heatmap_pred.png".format(slide_name), facecolor='w', dpi=600)
 np.save("{}_mask_true.npy".format(slide_name), mask)
 np.save("{}_mask_pred.npy".format(slide_name), pred.T)
 ```
-
-
-## License
-
-[MIT © Richard McRichface.](../LICENSE)
