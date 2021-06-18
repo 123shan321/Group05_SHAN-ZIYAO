@@ -321,6 +321,7 @@ batches_per_train_epoch = 50
 batches_per_val_epoch = 25
 epochs = 25
 ```
+Training & validation set randomly chosen at each training step, and no overfitting observed.
 
 Finally save the trained model.
 
@@ -335,6 +336,8 @@ model.save(MODEL_FINAL)
 Use the function `heatmap` to define and process `Prediction`, where the training and validation sets are selected from `CAMELYON17`, and the test data are from `CAMELYON16`.
 
 You can get the data at [CAMELYON16 challenge](https://camelyon17.grand-challenge.org/download/) and [CAMELYON17 challenge](https://camelyon17.grand-challenge.org/download/) (GoogleDrive/Baidu).
+
+WSI randomly picked from test set. 
 
 ```
 # Prediction
@@ -357,7 +360,8 @@ for tile, bound in tqdm(tile_iter):
             pred[int(bound[0][0] / 512) + i, int(bound[0][1] / 512) + j] = prob[0][0]
 print("prediction done.")
 ```
-plot images and save them.
+
+Plot images and save them. According to the results, due to the sparse sampling in the prediction step, the resolution of the prediction probability map is low. Although the overall trend is good, there is a limitation of inaccurate details of small tumors.
 
 ```
 plt.savefig("{}_heatmap_pred.png".format(slide_name), facecolor='w', dpi=600)
